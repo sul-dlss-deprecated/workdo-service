@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+	<context:property-placeholder
+		location="classpath:edu/stanford/sulair/dlss/dor/dao/jdbc.properties" />
+	
+	<bean id="dor.broker" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL">
+			<value>vm://localhost:61617?broker.persistent=false&amp;broker.useJmx=false</value>
+		</property>
+	</bean>
+	
+	<bean id="dor.messaging" class="edu.stanford.sulair.dlss.dor.service.JmsMessagingService"
+		p:topicName="fedora.apim.update" p:fedoraUrl="http://localhost:8080/fedora"
+        p:repository="dor"/>
+
+    <bean id="sdr.broker" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL">
+			<value>vm://localhost:61617?broker.persistent=false&amp;broker.useJmx=false</value>
+		</property>
+	</bean>
+
+    <bean id="sdr.messaging" class="edu.stanford.sulair.dlss.dor.service.JmsMessagingService"
+		p:topicName="fedora.apim.update" p:fedoraUrl="http://localhost:8080/fedora"
+        p:repository="sdr"/>
+</beans>

@@ -1,0 +1,102 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+	<context:property-placeholder location="WEB-INF/app.properties" />
+
+    <!-- Scan the dao and service packages so that they can be autowired into the Resources -->
+    <context:component-scan base-package="edu.stanford.sulair.dlss.dor.dao" />
+    <context:component-scan base-package="edu.stanford.sulair.dlss.dor.service" />
+
+    <!-- Since we aren't scanning the dor.resource package, declare the Resources explicitly -->
+    <bean class="edu.stanford.sulair.dlss.dor.resource.WorkflowResource" />
+
+    <bean id="workflowQueueResourceBean" class="edu.stanford.sulair.dlss.dor.resource.WorkflowQueueResource">
+    	<property name="repositoryMap">
+            <map>
+                <entry key="your_repo" value="${your_repo.fedora.host.uri}" />
+            </map>
+        </property>
+    </bean>
+
+      
+    <!--  Service and Dao beans.  The "backbone" of DOR 
+    	  Declare the real instances of these beans, since they can't be scanned without conflicting with the test/mock versions -->
+    
+    <bean id="dor" class="edu.stanford.sulair.dlss.dor.service.FedoraRepositoryService" init-method="init">
+    	<property name="fedoraHostUri" value="${your_repo.fedora.host.uri}"/>
+    	<property name="fedoraUser" value="${your_repo.fedora.user}"/>
+    	<property name="fedoraPassword" value="${your_repo.fedora.password}"/>
+    	<property name="workflowHostUri" value="${your_repo.workflow.host.uri}" />
+    	<property name="keystore" value="${ssl.keystore}" />
+    	<property name="keystorePassword" value="${ssl.keystore.password}" />
+    	<property name="truststore" value="${ssl.truststore}" />
+    	<property name="truststorePassword" value="${ssl.truststore.password}" />
+    </bean>
+
+	<bean class="edu.stanford.sulair.dlss.dor.service.WorkflowServiceImpl"
+          scope="prototype"/> 
+
+    <bean id="dor.messaging" class="edu.stanford.sulair.dlss.dor.service.JmsMessagingService"
+		p:topicName="fedora.apim.update" p:fedoraUrl="${your_repo.fedora.host.uri}/fedora"
+        scope="prototype" p:repository="your_repo"/>
+
+
+	<bean id="dao" class="edu.stanford.sulair.dlss.dor.dao.HibernateProcessDao" />
+		
+	<!-- JMS related beans -->	
+		
+	<!-- a pooling based JMS provider -->
+	<!-- 
+	<bean id="jmsFactory" class="org.apache.activemq.pool.PooledConnectionFactory"
+		destroy-method="stop">
+		<property name="connectionFactory" ref="factory" />
+	</bean>
+	-->
+	<bean id="your_repo.broker" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL">
+			<value>${your_repo.jms.broker.url}</value>
+		</property>
+	</bean>
+
+	<!-- Hibernate beans -->
+	
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		p:driverClass="${jdbc.driverClassName}" p:jdbcUrl="${jdbc.url}"
+		p:user="${jdbc.username}" p:password="${jdbc.password}"
+        p:idleConnectionTestPeriod="${c3p0.idleConnectionTestPeriod}"
+        p:preferredTestQuery="${c3p0.preferredTestQuery}"/>
+
+	
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="annotatedClasses">
+			<list>
+				<value>edu.stanford.sulair.dlss.dor.admin.Process</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+			</props>
+		</property>
+	</bean>
+	
+    <!-- Transactions -->
+    
+	<tx:annotation-driven transaction-manager="transactionManager"/>	
+
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager"
+		p:dataSource-ref="dataSource" p:sessionFactory-ref="sessionFactory" p:nestedTransactionAllowed="true" />
+    
+  
+    
+
+</beans>

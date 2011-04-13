@@ -1,0 +1,29 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--  Autowiring support (spring 2.5)  -->
+    <!--
+        The AutowiredAnnotationBeanPostProcessor and CommonAnnotationBeanPostProcessor are both
+        included implicitly when using the component-scan element.
+        That means that the two components are autodetected and  wired together
+    -->
+    <context:component-scan base-package="edu.stanford.sulair.dlss.dor"/>
+     
+    <bean id="singletonItem" class="edu.stanford.sulair.dlss.dor.Item" scope="singleton">
+        <property name="value">
+            <util:constant static-field="edu.stanford.sulair.dlss.dor.TestData.MANAGED" />
+        </property>
+    </bean>
+    
+
+</beans>

@@ -1,0 +1,194 @@
+<?xml version="1.0"?>
+
+<project name="workdo" basedir="." default="all">
+
+	<property name="name" value="workdo"/>
+
+	<property name="war.dir" value="WebContent"/>
+	<property name="src.dir" value="src"/>
+	<property name="build.dir" value="build"/>
+	<property name="webclasses.dir" value="${war.dir}/WEB-INF/classes"/>
+	<property name="weblib.dir" value="${war.dir}/WEB-INF/lib"/>
+	<property name="dist.dir" value="dist"/>
+	<property name="db.dir" value="db"/>
+	<property name="conf.dir" value="conf"/>
+
+
+	<property name="testsrc.dir" value="test"/>
+	<property name="testbuild.dir" value="test-build"/>
+	<property name="testlib.dir" value="lib-test"/>
+	<property name="testreports.dir" value="junit-reports"/>
+	<property name="testhtml.dir" value="${testreports.dir}/html"/>
+
+	
+	<path id="classpath">
+		<fileset dir="${weblib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<path id="test-classpath">
+		<fileset dir="${testlib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+    <property name="cobertura.dir" value="cobertura" />
+    <property name="cobertura.instr.dir" value="instr"/>
+    <property name="cobertura.coverage.dir" value="${build.dir}/coverage/cobertura" />
+    <path id="cobertura.classpath">
+            <fileset dir="${cobertura.dir}">
+
+                <include name="cobertura.jar" />
+                <include name="lib/**/*.jar" />
+            </fileset>
+    </path>
+
+	<target name="clean" description="Clean output dirs (build, docs, testbuild, testreports, weblib, dist)">
+		<delete dir="${build.dir}"/>
+		<delete file="${weblib.dir}/${name}.jar"/>
+		<delete dir="${testbuild.dir}"/>
+		<delete dir="${testreports.dir}"/>
+		<delete dir="${dist.dir}"/>
+		<delete dir="${webclasses.dir}"/>
+        <delete dir="${cobertura.instr.dir}" />
+        <delete file="cobertura.ser" />
+	</target>
+
+	<target name="build" description="Compile main source tree java files into class files, generate jar files">
+
+		<mkdir dir="${build.dir}"/>
+
+		<javac destdir="${build.dir}" source="1.5" target="1.5"
+				debug="true" deprecation="false" optimize="false" failonerror="true">
+			<src path="${src.dir}"/>
+			<classpath refid="classpath"/>
+		</javac>
+		
+	</target>
+	
+	<!--War building targets -->
+	
+	<target name="build-jar">
+
+		<mkdir dir="${dist.dir}"/>
+		
+		<jar jarfile="${weblib.dir}/${name}.jar" compress="true">
+			<fileset dir="${build.dir}">
+				<include name="**/*"/>
+			</fileset>
+		</jar>
+	
+	</target>
+		
+	<target name="workdo-war" >
+		
+		<war warfile="${dist.dir}/${name}.war" basedir="${war.dir}" webxml="${war.dir}/WEB-INF/web.xml">
+			<include name="*"/>
+			<include name="WEB-INF/*"/>
+			<exclude name="WEB-INF/web.xml"/>
+			<include name="WEB-INF/lib/**"/>
+			<include name="WEB-INF/classes/**"/>
+			<include name="META-INF/*"/>
+			<exclude name="**/.*"/>
+		</war>
+	</target>
+		
+    <!--Build the unit test classes -->
+	<target name="tests" depends="clean,build" description="Run tests">
+
+		<delete dir="${testbuild.dir}"/>
+		<mkdir dir="${testbuild.dir}"/>
+		
+		<delete dir="${testreports.dir}"/>
+		<mkdir dir="${testreports.dir}"/>
+		<delete dir="${testhtml.dir}"/>
+		<mkdir dir="${testhtml.dir}"/>
+		
+
+		<javac srcdir="${testsrc.dir}" destdir="${testbuild.dir}" debug="true" deprecation="true">
+			<classpath path="${build.dir}"/>
+			<classpath refid="classpath"/>
+			<classpath refid="test-classpath"/>
+		</javac>
+
+		<copy todir="${testbuild.dir}" preservelastmodified="true">
+			<fileset dir="${src.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.properties"/>
+			</fileset>
+			<fileset dir="${testsrc.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
+	</target>
+
+    <!-- Cobertura Code Coverage -->
+
+    <!-- Load cobertura custom ant tasks -->
+    <taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
+
+    <target name="cobertura-instrument" depends="clean,build" description="instrument classes for Cobertura">
+        <delete dir="${cobertura.instr.dir}" />
+        <mkdir dir="${cobertura.instr.dir}" />
+
+
+        <!-- Instrument the classes for cobertura -->
+        <cobertura-instrument todir="${cobertura.instr.dir}">
+            <fileset dir="${build.dir}">
+                <include name="**/*.class" />
+                <exclude name="**/*Tests.class" />
+                <exclude name="**/*Test.class" />
+            </fileset>
+        </cobertura-instrument>
+    </target>
+
+    <target name="cobertura-test" depends="clean,tests,cobertura-instrument" description="run tests with Coberatura code coverage">
+        <mkdir dir="${cobertura.coverage.dir}"/>
+
+        <junit showoutput="yes" printsummary="yes" forkmode="perBatch" haltonfailure="yes" haltonerror="yes">
+            <formatter type="xml" />
+
+            <classpath location="${cobertura.instr.dir}" />
+            <classpath path="${build.dir}"/>
+            <classpath path="${testbuild.dir}"/>
+            <classpath refid="classpath"/>
+			<classpath refid="test-classpath"/>
+            <classpath refid="cobertura.classpath" />
+
+
+            <!-- name of the coverage data file to use.  It must be the same
+            as the coverage data file generated during instrumentation. -->
+            <sysproperty key="net.sourceforge.cobertura.datafile"
+                file="cobertura.ser" />
+
+            <batchtest fork="yes" todir="${testreports.dir}">
+				<fileset dir="${testbuild.dir}">
+					<include name="**/*Tests.class"/>
+                    <include name="**/*Test.class" />
+					<exclude name="**/Abstract*Tests.class"/>
+                    <exclude name="**/Abstract*Test.class"/>
+					<exclude name="**/*SuiteTests.class"/>
+				</fileset>
+			</batchtest>
+        </junit>
+
+        <junitreport todir="${testhtml.dir}">
+	        <fileset dir="${testreports.dir}">
+			    <include name="TEST-*.xml"/>
+			</fileset>
+			<report format="frames" todir="${testhtml.dir}"/>
+		</junitreport>
+
+        <cobertura-report format="xml" destdir="${cobertura.coverage.dir}" srcdir="${src.dir}" />
+        <cobertura-report format="html" destdir="${cobertura.coverage.dir}" srcdir="${src.dir}" />
+    </target>
+
+	<target name="warfiles" depends="clean,build,tests,cobertura-test,build-jar,workdo-war" description="Build the web application archive">
+		<delete file="${weblib.dir}/${name}.jar" />
+	</target>
+	
+	<target name="all" depends="warfiles" />
+
+</project>

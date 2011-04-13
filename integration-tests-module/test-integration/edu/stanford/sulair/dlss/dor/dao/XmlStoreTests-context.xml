@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<bean id="xmlStore" class="edu.stanford.sulair.dlss.dor.dao.XmlStoreImpl" >
+		<property name="dbUri" value="http://localhost:8080/exist/rest/db/dor" />
+		<property name="user" value="dor" />
+		<property name="pword" value="dor" />
+	</bean>
+
+</beans>

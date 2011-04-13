@@ -1,0 +1,27 @@
+REM-------------------------------------------------
+REM Creates the workflow table and sequence to generate
+REM workflow ids
+REM--------------------------------------------------
+
+CREATE TABLE WORKFLOW
+(
+ID         			  INT  				NOT NULL,
+DRUID                 VARCHAR2(256)      NOT NULL,
+DATASTREAM            VARCHAR2(256)      NOT NULL,
+PROCESS	 			  VARCHAR2(256)  	NOT NULL,
+STATUS				  VARCHAR2(256)		NULL,
+ERROR_MSG			  VARCHAR2(4000)		NULL,
+ERROR_TXT			  CLOB				,
+DATETIME              TIMESTAMP     	NULL,
+ATTEMPTS	          INT				DEFAULT 0,
+LIFECYCLE			  VARCHAR2(256)     NULL,
+ELAPSED				  NUMBER(9,3)       NULL,
+REPOSITORY            VARCHAR2(256)     NULL,
+
+PRIMARY KEY (ID)
+);
+
+create sequence workflow_seq
+start with 1
+increment by 1
+nomaxvalue;

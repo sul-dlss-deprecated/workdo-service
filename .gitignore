@@ -1,0 +1,17 @@
+build/**/*
+instr/**/*
+*.iml
+*.ipr
+.idea/**/*
+out/**/*
+*.iws
+config
+coverage.ec
+.idea
+cobertura.ser
+junit-reports/*
+test-build/*
+dist/*
+WebContent/WEB-INF/keystore
+WebContent/WEB-INF/truststore
+

@@ -7,6 +7,7 @@ http://yourserver.yourschool.edu/workdo/{_your-repository-name}/objects/{_object
 
 e.g. https://services.stanford.edu/workdo/dor/objects/druid:123456/workflows/googleScannedBookWF would return this:
 <pre>
+<code>
 	<workflow objectId="druid:123456" id="googleScannedBookWF">
 		<process lifecycle="inprocess" elapsed="0.892" attempts="1" datetime="2011-01-06T20:53:35-0800" status="completed" name="register-object"/>
 		<process elapsed="1.191" attempts="1" datetime="2011-01-06T21:21:49-0800" status="completed" name="descriptive-metadata"/>
@@ -19,6 +20,7 @@ e.g. https://services.stanford.edu/workdo/dor/objects/druid:123456/workflows/goo
 		<process lifecycle="accessioned" elapsed="3.945" attempts="1" datetime="2011-03-16T15:20:25-0700" status="completed" name="cleanup"/>
 		<process lifecycle="archived" elapsed="0.0" attempts="0" datetime="2011-01-06T20:53:35-0800" status="waiting" name="sdr-ingest-archive"/>
 	</workflow>
+</code>
 </pre>
 
 h2. The Database

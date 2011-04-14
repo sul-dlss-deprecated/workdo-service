@@ -8,17 +8,18 @@ http://yourserver.yourschool.edu/workdo/{_your-repository-name}/objects/{_object
 e.g. https://services.stanford.edu/workdo/dor/objects/druid:123456/workflows/googleScannedBookWF would return this:
 <pre>
 	<code>
-<workflow id="googleScannedBookWF">
-     <process name="register-object" status="completed" lifecycle="inprocess" attempts="1" />
-     <process name="descriptive-metadata" status="waiting" />
-     <process name="google-convert" status="e" />
-     <process name="google-download" status="waiting" />
-     <process name="process-content" status="waiting" />
-     <process name="ingest-deposit" status="waiting" />
-     <process name="ingest" lifecycle="archived" status="waiting" />
-     <process name="shelve" lifecycle="released" status="waiting" />
-     <process name="cleanup" lifecycle="accessioned" status="waiting" />
-</workflow>
+	<workflow objectId="druid:123456" id="googleScannedBookWF">
+		<process lifecycle="inprocess" elapsed="0.892" attempts="1" datetime="2011-01-06T20:53:35-0800" status="completed" name="register-object"/>
+		<process elapsed="1.191" attempts="1" datetime="2011-01-06T21:21:49-0800" status="completed" name="descriptive-metadata"/>
+		<process elapsed="0.0" attempts="1" datetime="2011-01-06T20:53:35-0800" status="completed" name="google-convert"/>
+		<process elapsed="13.306" attempts="1" datetime="2011-01-07T00:44:16-0800" status="completed" name="google-download"/>
+		<process elapsed="93.328" attempts="1" datetime="2011-01-07T08:01:41-0800" status="completed" name="process-content"/>
+		<process elapsed="36.752" attempts="26" datetime="2011-03-16T14:54:01-0700" status="completed" name="sdr-ingest-transfer"/>
+		<process elapsed="0.0" attempts="1" datetime="2011-01-07T11:55:02-0800" status="completed" name="sdr-ingest-deposit"/>
+		<process lifecycle="released" elapsed="57.51" attempts="24" datetime="2011-03-16T14:55:21-0700" status="completed" name="shelve"/>
+		<process lifecycle="accessioned" elapsed="3.945" attempts="1" datetime="2011-03-16T15:20:25-0700" status="completed" name="cleanup"/>
+		<process lifecycle="archived" elapsed="0.0" attempts="0" datetime="2011-01-06T20:53:35-0800" status="waiting" name="sdr-ingest-archive"/>
+	</workflow>
 </code>
 </pre>
 

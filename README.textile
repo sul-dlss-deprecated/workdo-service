@@ -1,5 +1,9 @@
 h1. WorkDo Service
 
+h2. Overview
+
+Please see the included StanfordDigitalLibraryWorkflow.pdf for an overview
+
 h2. An Example Workflow
 
 Here's what the WorkDo service would return to you if you were to query the state of the workflow for one object:
